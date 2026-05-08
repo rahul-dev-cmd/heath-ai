@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover">
+  <title>SmartKitchen AI X | Full Command Center</title>
+  <!-- Fonts: Inter + Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Outfit', system-ui, -apple-system, sans-serif;
+      background: #0B1120;
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 45% 40%, rgba(34, 211, 238, 0.04) 0%, transparent 40%);
+      color: #F8FAFC;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1500px;
+      display: flex;
+      gap: 20px;
+      position: relative;
+      z-index: 2;
+      height: 95vh;
+      min-height: 850px;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 260px;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 32px;
+      padding: 28px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-left: 8px;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #CBD5E1;
+      transition: all 0.2s ease;
+      cursor: default;
+    }
+
+    .nav-item i {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-item.active {
+      background: rgba(34, 211, 238, 0.12);
+      color: #22D3EE;
+      box-shadow: 0 0 15px rgba(34,211,238,0.2);
+      border: 1px solid rgba(34,211,238,0.25);
+      text-shadow: 0 0 8px rgba(34,211,238,0.4);
+    }
+
+    .nav-item:not(.active):hover {
+      background: rgba(255,255,255,0.04);
+      color: #F8FAFC;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ===== MAIN PANEL ===== */
+    .main-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    /* GLASS CARD */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 24px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      transition: all 0.25s;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(56,189,248,0.25);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 8px 0;
+    }
+
+    .kitchen-badge {
+      background: rgba(16,185,129,0.18);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .glowing-dot {
+      width: 10px;
+      height: 10px;
+      background: #10B981;
+      border-radius: 50%;
+      box-shadow: 0 0 14px #10B981;
+      animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(1.4); }
+      100% { opacity: 0.8; transform: scale(1); }
+    }
+
+    .metric-large {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #38BDF8, #22D3EE);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .grid-auto {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 18px;
+    }
+
+    .kpi-card {
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sensor-panel {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .sensor-widget {
+      flex: 1;
+      min-width: 150px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .auth-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .btn-outline {
+      border: 1px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: #F8FAFC;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: #38BDF8;
+    }
+
+    .profile-avatar {
+      background: #8B5CF6;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .app-container {
+        flex-direction: column;
+        height: auto;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px;
+      }
+      .nav-menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <i data-lucide="chef-hat" style="color: #38BDF8; width: 32px; height: 32px;" stroke-width="1.8"></i>
+        <span style="font-weight: 800; font-size: 1.5rem;">SmartKitchen<span style="color: #22D3EE;">AI</span></span>
+      </div>
+      <nav class="nav-menu">
+        <div class="nav-item active"><i data-lucide="layout-dashboard"></i> Dashboard</div>
+        <div class="nav-item"><i data-lucide="trending-up"></i> Forecasting</div>
+        <div class="nav-item"><i data-lucide="package"></i> Inventory</div>
+        <div class="nav-item"><i data-lucide="trash-2"></i> Waste Analytics</div>
+        <div class="nav-item"><i data-lucide="leaf"></i> Sustainability</div>
+        <div class="nav-item"><i data-lucide="file-text"></i> Reports</div>
+        <div class="nav-item"><i data-lucide="settings"></i> Settings</div>
+      </nav>
+      <div class="sidebar-footer">
+        <div style="background: rgba(139,92,246,0.15); border-radius: 20px; padding: 14px; color: #CBD5E1;">
+          <i data-lucide="cpu" size="18"></i> AI Core v2.4
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="main-panel">
+      <!-- TOP NAVBAR with auth, kitchen name, live status -->
+      <div class="topbar">
+        <div class="kitchen-badge">
+          <div class="glowing-dot"></div>
+          <span style="color: #10B981;">Central Kitchen · Live</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 24px;">
+          <i data-lucide="bell" style="color: #CBD5E1; cursor: pointer;" size="22"></i>
+          <div class="auth-section">
+            <button class="btn-outline" id="loginBtn"><i data-lucide="log-in" size="18"></i> Login</button>
+            <button class="btn-outline" id="logoutBtn" style="display: none;"><i data-lucide="log-out" size="18"></i> Logout</button>
+            <div class="profile-avatar" id="profileAvatar">AK</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE KPI CARDS (Predicted Diners, Inventory, Food Prepared, Waste, Savings) -->
+      <div class="grid-auto">
+        <div class="glass-card kpi-card">
+          <div style="display: flex; justify-content: space-between;">
+            <i data-lucide="users" size="22" color="#38BDF8"></i>
+            <span style="background: rgba(56,189,248,0.15); padding:2px 12px; border-radius:20px; color:#38BDF8;">Today</span>
+          </div>
+          <span class="metric-large" id="predictedDiners">342</span>
+          <span class="text-secondary" style="font-size:0.9rem;">Predicted Diners</span>
+        </div>
+        <div class="glass-card kpi-card">
+          <div style="display: flex; justify-content: space-between;">
+            <i data-lucide="package" size="22" color="#8B5CF6"></i>
+          </div>
+          <span class="metric-large" style="background: linear-gradient(135deg,#8B5CF6,#C084FC); -webkit-background-clip: text; background-clip: text;">₹1.2L</span>
+          <span class="text-secondary">Current Inventory Value</span>
+        </div>
+        <div class="glass-card kpi-card">
+          <div style="display: flex; justify-content: space-between;">
+            <i data-lucide="utensils" size="22" color="#22D3EE"></i>
+          </div>
+          <span class="metric-large" id="foodPrepared">87.5 kg</span>
+          <span class="text-secondary">Food Prepared</span>
+        </div>
+        <div class="glass-card kpi-card">
+          <div style="display: flex; justify-content: space-between;">
+            <i data-lucide="trash-2" size="22" color="#F59E0B"></i>
+          </div>
+          <span class="metric-large" style="background: linear-gradient(135deg,#F59E0B,#EF4444); -webkit-background-clip: text; background-clip: text;" id="wasteToday">4.2 kg</span>
+          <span class="text-secondary">Waste Today</span>
+        </div>
+        <div class="glass-card kpi-card">
+          <div style="display: flex; justify-content: space-between;">
+            <i data-lucide="indian-rupee" size="22" color="#10B981"></i>
+          </div>
+          <span class="metric-large" style="background: linear-gradient(135deg,#10B981,#22C55E); -webkit-background-clip: text; background-clip: text;">₹24,500</span>
+          <span class="text-secondary">Savings (Month)</span>
+        </div>
+      </div>
+
+      <!-- SPECIALIZED CARDS: AI Forecasting, Waste Analytics, Inventory Tracking, Sustainability, Smart Alerts, Real-Time -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px;">
+        <!-- AI Forecasting Card -->
+        <div class="glass-card" style="padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+            <i data-lucide="sparkles" size="22" color="#22D3EE"></i>
+            <h3 style="font-weight: 700; color: #22D3EE;">AI Forecasting</h3>
+          </div>
+          <div id="aiForecastContent">
+            <p style="color:#CBD5E1; margin-bottom: 12px;">Tomorrow: <strong style="color:#38BDF8;">310 diners</strong> (↓8%)</p>
+            <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; width: 100%;">
+              <div style="width: 72%; height: 6px; background: linear-gradient(90deg,#38BDF8,#8B5CF6); border-radius: 10px;"></div>
+            </div>
+            <p style="margin-top: 12px; font-size:0.8rem; color:#64748B;">Confidence 94% · Reduce rice by 12%</p>
+          </div>
+        </div>
+
+        <!-- Waste Analytics Card -->
+        <div class="glass-card" style="padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <i data-lucide="bar-chart" size="22" color="#F59E0B"></i>
+            <h3 style="font-weight: 700;">Waste Analytics</h3>
+          </div>
+          <div style="display: flex; gap: 30px; align-items: center;">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: conic-gradient(#22D3EE 0deg 200deg, #8B5CF6 200deg 290deg, #F59E0B 290deg 360deg);"></div>
+            <div><span style="color:#22D3EE;">●</span> Rice 38%<br><span style="color:#8B5CF6;">●</span> Dal 22%</div>
+          </div>
+        </div>
+
+        <!-- Inventory Tracking Card -->
+        <div class="glass-card" style="padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <i data-lucide="clipboard-list" size="22" color="#8B5CF6"></i>
+            <h3 style="font-weight: 700;">Inventory Tracking</h3>
+          </div>
+          <div><span class="text-secondary">Rice:</span> <strong>48 kg</strong> <span style="color:#10B981;">(ok)</span></div>
+          <div><span class="text-secondary">Dal:</span> <strong>22 kg</strong> <span style="color:#F59E0B;">(reorder)</span></div>
+          <div><span class="text-secondary">Oil:</span> <strong>15 L</strong></div>
+        </div>
+
+        <!-- Sustainability Metrics Card -->
+        <div class="glass-card" style="padding: 20px; background: rgba(16,185,129,0.08);">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <i data-lucide="leaf" size="22" color="#10B981"></i>
+            <h3 style="font-weight: 700; color:#10B981;">Sustainability</h3>
+          </div>
+          <div><span class="metric-large" style="font-size:1.8rem;">248 kg</span> food saved</div>
+          <div>🌱 0.9t CO₂ avoided</div>
+        </div>
+
+        <!-- Smart Alerts Card -->
+        <div class="glass-card" style="padding: 20px; border-left: 4px solid #EF4444;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i data-lucide="alert-triangle" size="22" color="#EF4444"></i>
+            <h3 style="font-weight: 700;">Smart Alerts</h3>
+          </div>
+          <p style="margin-top: 10px; color:#CBD5E1;">⚠️ Dal stock low · <span style="color:#F59E0B;">Order 12 kg</span></p>
+          <p style="color:#CBD5E1;">📊 Waste spike detected</p>
+        </div>
+
+        <!-- Real-Time Dashboard Card (compact) -->
+        <div class="glass-card" style="padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i data-lucide="activity" size="22" color="#22D3EE"></i>
+            <h3 style="font-weight: 700;">Real-Time Status</h3>
+          </div>
+          <div style="margin-top: 10px; display: flex; gap: 20px;">
+            <div><span class="glowing-dot" style="width:8px;height:8px;"></span> Oven</div>
+            <div><span class="glowing-dot" style="width:8px;height:8px;"></span> Fridge</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REAL-TIME SENSOR PANEL (Rice, Dal, Waste Bin) -->
+      <div class="glass-card" style="padding: 22px;">
+        <h3 style="font-weight: 700; margin-bottom: 18px; display: flex; gap: 8px;"><i data-lucide="radio"></i> Live Sensor Feed</h3>
+        <div class="sensor-panel">
+          <div class="sensor-widget glass-card" style="background: rgba(255,255,255,0.03);">
+            <i data-lucide="cylinder" size="24" color="#38BDF8"></i>
+            <div>
+              <div class="text-muted" style="font-size:0.8rem;">Rice Container</div>
+              <strong style="font-size:1.6rem;" id="riceWeight">32.6 kg</strong>
+            </div>
+          </div>
+          <div class="sensor-widget glass-card" style="background: rgba(255,255,255,0.03);">
+            <i data-lucide="cylinder" size="24" color="#8B5CF6"></i>
+            <div>
+              <div class="text-muted" style="font-size:0.8rem;">Dal Container</div>
+              <strong style="font-size:1.6rem;" id="dalWeight">18.2 kg</strong>
+            </div>
+          </div>
+          <div class="sensor-widget glass-card" style="background: rgba(255,255,255,0.03);">
+            <i data-lucide="trash" size="24" color="#F59E0B"></i>
+            <div>
+              <div class="text-muted" style="font-size:0.8rem;">Waste Bin</div>
+              <strong style="font-size:1.6rem;" id="wasteBinWeight">5.7 kg</strong>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 12px; font-size:0.8rem; color:#64748B;">Updates every 3 seconds · <span class="glowing-dot" style="width:7px;height:7px;display:inline-block;"></span> live</div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // Elements
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const avatar = document.getElementById('profileAvatar');
+    
+    // API Configuration
+    const API_BASE = 'http://localhost:8000/api/v1';
+    let token = null;
+    let kitchenId = null;
+    let isConnected = false;
+
+    async function connectToBackend() {
+      try {
+        // 1. Try to register/login demo account
+        let res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email: 'demo@smartkitchen.ai', password: 'password123'})
+        });
+        
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              name: 'Demo Admin',
+              email: 'demo@smartkitchen.ai',
+              password: 'password123',
+              kitchen_name: 'Central AI Kitchen',
+              kitchen_type: 'college'
+            })
+          });
+        }
+        
+        const data = await res.json();
+        if (data.access_token) {
+          token = data.access_token;
+          
+          // 2. Get kitchen ID
+          const kitRes = await fetch(`${API_BASE}/kitchens`, {
+            headers: {'Authorization': `Bearer ${token}`}
+          });
+          const kitchens = await kitRes.json();
+          if (kitchens && kitchens.length > 0) {
+            kitchenId = kitchens[0].id;
+            isConnected = true;
+            updateAuthUI(true);
+            
+            // 3. Setup demo data if empty
+            await setupDemoInventory();
+            
+            // 4. Fetch initial real data
+            await refreshData();
+            // Start polling for real data
+            setInterval(refreshData, 10000);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("Backend not running. Using offline simulation mode.");
+      }
+      
+      // Fallback if backend connection fails
+      isConnected = false;
+      setInterval(updateSimulatedSensors, 3000);
+      updateSimulatedSensors();
+    }
+
+    async function refreshData() {
+      if (!isConnected) return;
+      
+      try {
+        // Fetch Dashboard
+        const dashRes = await fetch(`${API_BASE}/kitchens/${kitchenId}/dashboard`, {
+          headers: {'Authorization': `Bearer ${token}`}
+        });
+        if (dashRes.ok) {
+          const dash = await dashRes.json();
+          document.getElementById('predictedDiners').textContent = dash.total_meals_today > 0 ? dash.total_meals_today : 342;
+          document.getElementById('wasteToday').textContent = dash.waste_percentage + '%';
+        }
+
+        // Fetch Forecast (ML Model)
+        const dateStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+        const forecastRes = await fetch(`${API_BASE}/kitchens/${kitchenId}/forecast?date=${dateStr}`, {
+          headers: {'Authorization': `Bearer ${token}`}
+        });
+        
+        if (forecastRes.ok) {
+          const forecast = await forecastRes.json();
+          let totalKg = 0;
+          let topItem = null;
+          let topVal = 0;
+          
+          if (forecast.predictions && forecast.predictions.length > 0) {
+              forecast.predictions.forEach(p => {
+                  totalKg += p.predicted_kg;
+                  if (p.predicted_kg > topVal) {
+                      topVal = p.predicted_kg;
+                      topItem = p.item;
+                  }
+              });
+              
+              const conf = forecast.predictions[0].confidence || 0.9;
+              document.getElementById('aiForecastContent').innerHTML = `
+                <p style="color:#CBD5E1; margin-bottom: 12px;">Tomorrow: <strong style="color:#38BDF8;">${totalKg.toFixed(1)} kg</strong> expected</p>
+                <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; width: 100%;">
+                  <div style="width: ${(conf * 100).toFixed(0)}%; height: 6px; background: linear-gradient(90deg,#38BDF8,#8B5CF6); border-radius: 10px;"></div>
+                </div>
+                <p style="margin-top: 12px; font-size:0.8rem; color:#64748B;">Confidence ${(conf * 100).toFixed(0)}% · Prepare ${topVal.toFixed(1)}kg of ${topItem}</p>
+              `;
+          }
+        }
+        
+        // Fetch Inventory
+        const invRes = await fetch(`${API_BASE}/kitchens/${kitchenId}/inventory`, {
+          headers: {'Authorization': `Bearer ${token}`}
+        });
+        if (invRes.ok) {
+          const items = await invRes.json();
+          const rice = items.find(i => i.name.toLowerCase().includes('rice'));
+          const dal = items.find(i => i.name.toLowerCase().includes('dal'));
+          
+          if (rice) document.getElementById('riceWeight').textContent = rice.quantity.toFixed(1) + ' kg';
+          if (dal) document.getElementById('dalWeight').textContent = dal.quantity.toFixed(1) + ' kg';
+        }
+        
+      } catch (e) {
+        console.error("Error fetching data:", e);
+      }
+    }
+    
+    async function setupDemoInventory() {
+        const invRes = await fetch(`${API_BASE}/kitchens/${kitchenId}/inventory`, {
+          headers: {'Authorization': `Bearer ${token}`}
+        });
+        if (invRes.ok) {
+            const items = await invRes.json();
+            if (items.length === 0) {
+                await fetch(`${API_BASE}/kitchens/${kitchenId}/inventory`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                    body: JSON.stringify({name: 'Basmati Rice', category: 'grains', quantity: 32.5, min_threshold: 10})
+                });
+                await fetch(`${API_BASE}/kitchens/${kitchenId}/inventory`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                    body: JSON.stringify({name: 'Toor Dal', category: 'pulses', quantity: 18.2, min_threshold: 5})
+                });
+            }
+        }
+    }
+
+    function updateAuthUI(isLoggedIn) {
+      if (isLoggedIn) {
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'flex';
+        avatar.style.background = '#10B981';
+      } else {
+        loginBtn.style.display = 'flex';
+        logoutBtn.style.display = 'none';
+        avatar.style.background = '#8B5CF6';
+      }
+    }
+
+    loginBtn.addEventListener('click', connectToBackend);
+    logoutBtn.addEventListener('click', () => {
+      isConnected = false;
+      token = null;
+      updateAuthUI(false);
+      updateSimulatedSensors();
+    });
+
+    // Simulated fallback for offline
+    function randomAround(base, range = 0.8) {
+      return (base + (Math.random() * range * 2 - range)).toFixed(1);
+    }
+    function updateSimulatedSensors() {
+      if (isConnected) return; // Don't override real data
+      document.getElementById('riceWeight').textContent = randomAround(32.6, 0.7) + ' kg';
+      document.getElementById('dalWeight').textContent = randomAround(18.2, 0.5) + ' kg';
+      document.getElementById('wasteBinWeight').textContent = randomAround(5.7, 0.6) + ' kg';
+
+      const dinersEl = document.getElementById('predictedDiners');
+      if (dinersEl) dinersEl.textContent = Math.floor(340 + Math.random() * 8);
+      const foodEl = document.getElementById('foodPrepared');
+      if (foodEl) foodEl.textContent = (87 + Math.random() * 2).toFixed(1) + ' kg';
+      const wasteEl = document.getElementById('wasteToday');
+      if (wasteEl) wasteEl.textContent = (4.2 + (Math.random()*0.6 - 0.3)).toFixed(1) + ' kg';
+    }
+
+    // Initialize connection
+    connectToBackend();
+  </script>
+</body>
+</html>
